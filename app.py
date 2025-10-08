@@ -1,8 +1,10 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify, CORS
+
 import pandas as pd
 import mysql.connector
 
 app = Flask(__name__)
+CORS(app)
 
 # -----------------------
 # MySQL Connection
@@ -28,6 +30,9 @@ def index():
 # -----------------------
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    if 'excel_file' not in request.files:
+        return jsonify({"message": "No file received"}), 400
+
     file = request.files['excel_file']
     if file:
         df = pd.read_excel(file)
@@ -60,8 +65,9 @@ def upload_file():
         cursor.close()
         conn.close()
 
-        return "File uploaded and data inserted successfully!"
-    return "No file received"
+        return jsonify({"message": "File uploaded and data inserted successfully!"})
+    
+    return jsonify({"message": "No file received"}), 400
 
 # -----------------------
 # View Table Data
@@ -82,3 +88,4 @@ def view_table(table_name):
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
