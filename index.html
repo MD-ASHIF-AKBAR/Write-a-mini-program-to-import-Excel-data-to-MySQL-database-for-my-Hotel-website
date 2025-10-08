@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <link rel="icon" href="favicon.svg">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Upload Interface</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: "Poppins", sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            height: 100vh;
+            width: 100%;
+            padding-bottom: 15px;
+            /* margin from bottom */
+        }
+
+        .messages {
+            flex: 1;
+            display: flex;
+            flex-direction: column-reverse;
+            padding: 15px;
+            overflow-y: auto;
+            background: #fff;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            margin: 8px 0;
+            word-wrap: break-word;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            background: #e9f3ff;
+            color: #222;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #007bff;
+            color: #fff;
+        }
+
+        .input-area {
+            background: #f9fafc;
+            border-top: 1px solid #ddd;
+            padding: 6px 10px;
+            /* smaller height */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-radius: 10px;
+            margin: 0 10px;
+            /* margin from sides */
+        }
+
+        input[type="file"] {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        button {
+            background: #007bff;
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            /* smaller button */
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        @media (max-width: 600px) {
+            .message {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="messages" id="messages">
+            <div class="message bot">👋 Hi! Choose a file and click Upload.</div>
+        </div>
+
+        <div class="input-area">
+            <input type="file" id="fileInput" />
+            <button id="uploadBtn">Upload</button>
+        </div>
+    </div>
+
+    <script>
+        const messages = document.getElementById("messages");
+        const fileInput = document.getElementById("fileInput");
+        const uploadBtn = document.getElementById("uploadBtn");
+
+        function addMessage(text, type = "bot") {
+            const msg = document.createElement("div");
+            msg.classList.add("message", type);
+            msg.textContent = text;
+            messages.prepend(msg);
+            messages.scrollTop = 0;
+        }
+
+        uploadBtn.addEventListener("click", async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                addMessage("Please select a file first!", "bot");
+                return;
+            }
+
+            addMessage(`📤 Uploading: ${file.name}`, "user");
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const res = await fetch("http://localhost:5000/upload", {
+                    method: "POST",
+                    body: formData,
+                });
+                const result = await res.json();
+                addMessage(result.message, "bot");
+            } catch (err) {
+                addMessage("❌ Upload failed! Check your server.", "bot");
+            }
+        });
+    </script>
+</body>
+
+</html>
