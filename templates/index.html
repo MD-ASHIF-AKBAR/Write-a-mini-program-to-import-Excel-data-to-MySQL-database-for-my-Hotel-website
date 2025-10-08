@@ -72,8 +72,6 @@
     </main>
 
 <script>
-//const BACKEND_URL = "https://write-a-mini-program-to-import-excel.onrender.com";
-    
 async function uploadFile() {
     const fileInput = document.getElementById("fileInput");
     if (!fileInput.files.length) {
@@ -85,21 +83,29 @@ async function uploadFile() {
     formData.append("excel_file", fileInput.files[0]);
 
     try {
-        //const response = await fetch(`${BACKEND_URL}/upload`, {
         const response = await fetch(`/upload`, {
             method: "POST",
             body: formData
         });
-        const result = await response.json();
-        alert(result.message);
+
+        const text = await response.text(); // get raw response
+        try {
+            const result = JSON.parse(text); // try to parse JSON
+            alert(result.message);
+        } catch (e) {
+            console.error("Response is not JSON:", text);
+            alert("Upload failed! Server returned HTML or error page. Check console.");
+        }
     } catch (error) {
         alert("Error uploading file: " + error.message);
     }
 }
 </script>
+
     
 </body>
 </html>
+
 
 
 
