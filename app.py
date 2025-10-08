@@ -12,10 +12,10 @@ CORS(app)
 # -----------------------
 def get_db_connection():
     conn = mysql.connector.connect(
-        host="localhost",       # change if using remote DB
-        user="root",            # your DB username
-        password="password",    # your DB password
-        database="hotel_db"     # database name
+        host="dpg-d3jbk7i4d50c73f31jq0-a",       # change if using remote DB
+        user="storage_u6e8_user",            # your DB username
+        password="6i0Us6xp0G5hPgoNfiUewnWbSma4L86C",    # your DB password
+        database="storage_u6e8"     # database name
     )
     return conn
 
@@ -89,5 +89,6 @@ def view_table(table_name):
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
