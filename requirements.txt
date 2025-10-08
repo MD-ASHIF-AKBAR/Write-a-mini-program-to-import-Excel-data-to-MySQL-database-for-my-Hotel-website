@@ -1,6 +1,6 @@
 Flask
 pandas
-mysql-connector-python
+psycopg2-binary
 openpyxl
 gunicorn
 flask-cors
