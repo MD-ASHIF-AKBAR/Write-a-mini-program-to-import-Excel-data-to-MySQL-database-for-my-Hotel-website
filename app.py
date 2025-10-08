@@ -98,9 +98,10 @@ def test_db():
         return "Database connection successful!"
     except Exception as e:
         return f"DB connection failed: {e}"
+        
 @app.route('/create_tables')
+def create_tables():
     conn = get_db_connection()
-    
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -111,28 +112,33 @@ def test_db():
         phone VARCHAR(50),
         city VARCHAR(100),
         notes TEXT
-    );
-    
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS Orders (
         id SERIAL PRIMARY KEY,
         customer_id INT REFERENCES Customers(id),
         order_date DATE,
         payment_status VARCHAR(50)
-    );
-    
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS OrderItems (
         id SERIAL PRIMARY KEY,
         order_id INT REFERENCES Orders(id),
         item_name VARCHAR(255),
         quantity INT,
         price NUMERIC(10,2)
-    );
+    )
     """)
     
     conn.commit()
     cursor.close()
     conn.close()
-    print("Tables created successfully!")
+    return "Tables created successfully!"
+
 
 
 # -----------------------
@@ -140,6 +146,7 @@ def test_db():
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
