@@ -11,7 +11,7 @@ CORS(app)
 # MySQL Connection
 # -----------------------
 def get_db_connection():
-    conn = psycopg2.connector.connect(
+    conn = psycopg2.connect(
         host="dpg-d3jbk7i4d50c73f31jq0-a",       # change if using remote DB
         user="storage_u6e8_user",            # your DB username
         password="6i0Us6xp0G5hPgoNfiUewnWbSma4L86C",    # your DB password
@@ -102,6 +102,7 @@ def test_db():
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
