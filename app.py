@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template, jsonify, CORS
+from flask import Flask, request, render_template, jsonify
+from flask_cors import CORS
 
 import pandas as pd
 import mysql.connector
@@ -88,4 +89,5 @@ def view_table(table_name):
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
