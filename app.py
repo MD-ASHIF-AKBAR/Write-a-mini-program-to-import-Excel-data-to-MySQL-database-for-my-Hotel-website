@@ -42,32 +42,35 @@ def upload_file():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        for index, row in df.iterrows():
-            # Insert customer
-            cursor.execute("""
-                INSERT INTO Customers (name, email, phone, city, notes)
-                VALUES (%s, %s, %s, %s, %s)
-                RETURNING id
-            """, (row['CustomerName'], row['Email'], row['Phone'], row['City'], row['Notes']))
-            customer_id = cursor.fetchone()[0]
-            
-            # Insert order
-            cursor.execute("""
-                INSERT INTO Orders (customer_id, order_date, payment_status)
-                VALUES (%s, %s, %s)
-                RETURNING id
-            """, (customer_id, row['OrderDate'], row['PaymentStatus']))
-            order_id = cursor.fetchone()[0]
+        try:
+            for index, row in df.iterrows():
+                # Insert customer and get ID
+                cursor.execute("""
+                    INSERT INTO Customers (name, email, phone, city, notes)
+                    VALUES (%s, %s, %s, %s, %s) RETURNING id
+                """, (row['CustomerName'], row['Email'], row['Phone'], row['City'], row['Notes']))
+                customer_id = cursor.fetchone()[0]
 
-            # Insert order item
-            cursor.execute("""
-                INSERT INTO OrderItems (order_id, item_name, quantity, price)
-                VALUES (%s,%s,%s,%s)
-            """, (order_id, row['ItemName'], row['Quantity'], row['Price']))
+                # Insert order and get ID
+                cursor.execute("""
+                    INSERT INTO Orders (customer_id, order_date, payment_status)
+                    VALUES (%s, %s, %s) RETURNING id
+                """, (customer_id, row['OrderDate'], row['PaymentStatus']))
+                order_id = cursor.fetchone()[0]
 
-        conn.commit()
-        cursor.close()
-        conn.close()
+                # Insert order item
+                cursor.execute("""
+                    INSERT INTO OrderItems (order_id, item_name, quantity, price)
+                    VALUES (%s, %s, %s, %s)
+                """, (order_id, row['ItemName'], row['Quantity'], row['Price']))
+
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            return jsonify({"message": f"Error inserting data: {e}"}), 500
+        finally:
+            cursor.close()
+            conn.close()
 
         return jsonify({"message": "File uploaded and data inserted successfully!"})
     
@@ -102,6 +105,7 @@ def test_db():
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
