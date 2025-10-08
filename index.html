@@ -1,165 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File Upload Chat</title>
+    <title>Hotel Demo Dashboard</title>
     <style>
         body {
-            background: #f8f9fb;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-end;
-            height: 100vh;
-            margin: 0;
             font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
         }
-
-        .chat-box {
-            width: 100%;
-            max-width: 600px;
-            height: 80vh;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
+        header {
+            background-color: #4CAF50;
+            color: white;
             padding: 20px;
-            overflow-y: auto;
+            text-align: center;
         }
-
-        .chat-input {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-top: 10px;
+        main {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
         }
-
+        h2 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
         input[type="file"] {
-            flex: 1;
-            border: 1px solid #ddd;
-            padding: 8px;
-            border-radius: 10px;
+            padding: 5px;
         }
-
         button {
-            background: #007bff;
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #4CAF50;
             color: white;
             border: none;
-            padding: 10px 16px;
-            border-radius: 10px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 14px;
         }
-
         button:hover {
-            background: #0056b3;
+            background-color: #45a049;
         }
-
-        .message {
-            margin: 5px 0;
-            padding: 10px;
-            border-radius: 10px;
-        }
-
-        .user {
-            background: #007bff;
-            color: white;
-            align-self: flex-end;
-        }
-
-        .bot {
-            background: #e9ecef;
-            align-self: flex-start;
-        }
-
-        #fileList p {
-            margin: 5px 0;
-            padding: 5px;
-            background: #f1f3f5;
-            border-radius: 8px;
+        .table-buttons a {
+            text-decoration: none;
         }
     </style>
 </head>
-
 <body>
-    <div class="chat-box" id="chatBox">
-        <div class="chat-input">
-            <input type="file" id="fileInput">
-            <button onclick="uploadFile()">Upload</button>
-            <button onclick="getFiles()">Show Uploaded Files</button>
+    <header>
+        <h1>Hotel Demo Dashboard</h1>
+    </header>
+    <main>
+        <div class="section">
+            <h2>Upload Excel File</h2>
+            <form action="/upload" method="POST" enctype="multipart/form-data">
+                <input type="file" name="excel_file" required>
+                <button type="submit">Upload</button>
+            </form>
         </div>
-        <div id="fileList"></div>
-    </div>
 
-    <script>
-        const BACKEND_URL = "https://write-a-mini-program-to-import-excel.onrender.com";
-
-        async function uploadFile() {
-            const fileInput = document.getElementById("fileInput");
-            if (!fileInput.files.length) {
-                addMessage("Please select a file first!", "bot");
-                return;
-            }
-
-            const file = fileInput.files[0];
-            const formData = new FormData();
-            formData.append("file", file);
-
-            addMessage(`Uploading ${file.name}...`, "user");
-
-            try {
-                const response = await fetch(`${BACKEND_URL}/upload`, {
-                    method: "POST",
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    addMessage(result.message, "bot");
-                } else {
-                    addMessage("Upload failed: " + (result.message || "Server error"), "bot");
-                }
-            } catch (error) {
-                addMessage("Error connecting to server: " + error.message, "bot");
-            }
-        }
-
-        async function getFiles() {
-            try {
-                const response = await fetch(`${BACKEND_URL}/files`);
-                const data = await response.json();
-
-                const fileListDiv = document.getElementById("fileList");
-                fileListDiv.innerHTML = "";
-
-                if (data.files.length === 0) {
-                    fileListDiv.innerHTML = "<p>No files uploaded yet.</p>";
-                } else {
-                    data.files.forEach(f => {
-                        const p = document.createElement("p");
-                        p.textContent = f;
-                        fileListDiv.appendChild(p);
-                    });
-                }
-            } catch (error) {
-                alert("Error fetching files: " + error.message);
-            }
-        }
-
-        function addMessage(text, sender) {
-            const chatBox = document.getElementById("chatBox");
-            const msg = document.createElement("div");
-            msg.className = `message ${sender}`;
-            msg.innerText = text;
-            chatBox.insertBefore(msg, chatBox.querySelector(".chat-input"));
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    </script>
+        <div class="section">
+            <h2>View Tables</h2>
+            <div class="table-buttons">
+                <a href="/view/Customers"><button>View Customers</button></a>
+                <a href="/view/Orders"><button>View Orders</button></a>
+                <a href="/view/OrderItems"><button>View Order Items</button></a>
+            </div>
+        </div>
+    </main>
 </body>
-
 </html>
