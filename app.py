@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, jsonify
 from flask_cors import CORS
 
 import pandas as pd
-import mysql.connector
+import psycopg2
 
 app = Flask(__name__)
 CORS(app)
@@ -11,11 +11,12 @@ CORS(app)
 # MySQL Connection
 # -----------------------
 def get_db_connection():
-    conn = mysql.connector.connect(
+    conn = psycopg2.connector.connect(
         host="dpg-d3jbk7i4d50c73f31jq0-a",       # change if using remote DB
         user="storage_u6e8_user",            # your DB username
         password="6i0Us6xp0G5hPgoNfiUewnWbSma4L86C",    # your DB password
         database="storage_u6e8"     # database name
+        port=5432 
     )
     return conn
 
@@ -45,16 +46,18 @@ def upload_file():
             # Insert customer
             cursor.execute("""
                 INSERT INTO Customers (name, email, phone, city, notes)
-                VALUES (%s,%s,%s,%s,%s)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING id
             """, (row['CustomerName'], row['Email'], row['Phone'], row['City'], row['Notes']))
-            customer_id = cursor.lastrowid
-
+            customer_id = cursor.fetchone()[0]
+            
             # Insert order
             cursor.execute("""
                 INSERT INTO Orders (customer_id, order_date, payment_status)
-                VALUES (%s,%s,%s)
+                VALUES (%s, %s, %s)
+                RETURNING id
             """, (customer_id, row['OrderDate'], row['PaymentStatus']))
-            order_id = cursor.lastrowid
+            order_id = cursor.fetchone()[0]
 
             # Insert order item
             cursor.execute("""
@@ -99,6 +102,7 @@ def test_db():
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
