@@ -139,6 +139,18 @@ def create_tables():
     conn.close()
     return "Tables created successfully!"
 
+@app.route('/clear_data')
+def clear_data():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("TRUNCATE TABLE OrderItems, Orders, Customers RESTART IDENTITY CASCADE;")
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return "All data cleared successfully!"
+    except Exception as e:
+        return f"Error clearing data: {e}"
 
 
 # -----------------------
@@ -146,6 +158,7 @@ def create_tables():
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
