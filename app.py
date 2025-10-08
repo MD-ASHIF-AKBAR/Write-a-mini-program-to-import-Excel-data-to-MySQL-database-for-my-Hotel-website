@@ -84,11 +84,22 @@ def view_table(table_name):
     conn.close()
     return render_template('view_table.html', columns=columns, rows=rows, table_name=table_name)
 
+@app.route('/test-db')
+def test_db():
+    try:
+        conn = get_db_connection()
+        conn.close()
+        return "Database connection successful!"
+    except Exception as e:
+        return f"DB connection failed: {e}"
+
+
 # -----------------------
 # Run App
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
