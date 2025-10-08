@@ -99,12 +99,7 @@ def test_db():
     except Exception as e:
         return f"DB connection failed: {e}"
 @app.route('/create_tables')
-    conn = psycopg2.connect(
-        host="your_host",
-        database="your_db",
-        user="your_user",
-        password="your_password"
-    )
+    conn = get_db_connection()
     
     cursor = conn.cursor()
     
@@ -145,6 +140,7 @@ def test_db():
 # -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
