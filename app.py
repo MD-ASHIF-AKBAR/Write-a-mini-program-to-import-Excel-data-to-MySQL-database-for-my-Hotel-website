@@ -9,7 +9,7 @@ app = Flask(__name__)
 # -----------------------
 def get_db_connection():
     conn = mysql.connector.connect(
-        host="localhost",       # change if remote DB
+        host="localhost",       # change if using remote DB
         user="root",            # your DB username
         password="password",    # your DB password
         database="hotel_db"     # database name
@@ -30,7 +30,6 @@ def index():
 def upload_file():
     file = request.files['excel_file']
     if file:
-        # Read Excel into pandas
         df = pd.read_excel(file)
 
         conn = get_db_connection()
