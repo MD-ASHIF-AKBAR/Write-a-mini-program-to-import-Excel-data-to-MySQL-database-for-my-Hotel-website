@@ -1,35 +1,25 @@
 from flask import Flask, request, render_template, jsonify
 from flask_cors import CORS
-
 import pandas as pd
 import psycopg2
 
 app = Flask(__name__)
 CORS(app)
 
-# -----------------------
-# MySQL Connection
-# -----------------------
 def get_db_connection():
     conn = psycopg2.connect(
-        host="dpg-d3jbk7i4d50c73f31jq0-a",       # change if using remote DB
-        user="storage_u6e8_user",            # your DB username
-        password="6i0Us6xp0G5hPgoNfiUewnWbSma4L86C",    # your DB password
-        database="storage_u6e8",     # database name
-        port=5432 
+        host="dpg-d3jbk7i4d50c73f31jq0-a",
+        user="storage_u6e8_user",
+        password="6i0Us6xp0G5hPgoNfiUewnWbSma4L86C",
+        database="storage_u6e8",
+        port=5432
     )
     return conn
 
-# -----------------------
-# Homepage
-# -----------------------
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# -----------------------
-# Upload Excel File
-# -----------------------
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'excel_file' not in request.files:
@@ -38,27 +28,23 @@ def upload_file():
     file = request.files['excel_file']
     if file:
         df = pd.read_excel(file)
-
         conn = get_db_connection()
         cursor = conn.cursor()
 
         try:
-            for index, row in df.iterrows():
-                # Insert customer and get ID
+            for _, row in df.iterrows():
                 cursor.execute("""
                     INSERT INTO Customers (name, email, phone, city, notes)
                     VALUES (%s, %s, %s, %s, %s) RETURNING id
                 """, (row['CustomerName'], row['Email'], row['Phone'], row['City'], row['Notes']))
                 customer_id = cursor.fetchone()[0]
 
-                # Insert order and get ID
                 cursor.execute("""
                     INSERT INTO Orders (customer_id, order_date, payment_status)
                     VALUES (%s, %s, %s) RETURNING id
                 """, (customer_id, row['OrderDate'], row['PaymentStatus']))
                 order_id = cursor.fetchone()[0]
 
-                # Insert order item
                 cursor.execute("""
                     INSERT INTO OrderItems (order_id, item_name, quantity, price)
                     VALUES (%s, %s, %s, %s)
@@ -76,9 +62,6 @@ def upload_file():
     
     return jsonify({"message": "No file received"}), 400
 
-# -----------------------
-# View Table Data
-# -----------------------
 @app.route('/view/<table_name>')
 def view_table(table_name):
     conn = get_db_connection()
@@ -98,7 +81,7 @@ def test_db():
         return "Database connection successful!"
     except Exception as e:
         return f"DB connection failed: {e}"
-        
+
 @app.route('/create_tables')
 def create_tables():
     conn = get_db_connection()
@@ -114,7 +97,6 @@ def create_tables():
         notes TEXT
     )
     """)
-
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS Orders (
         id SERIAL PRIMARY KEY,
@@ -123,7 +105,6 @@ def create_tables():
         payment_status VARCHAR(50)
     )
     """)
-
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS OrderItems (
         id SERIAL PRIMARY KEY,
@@ -152,21 +133,5 @@ def clear_data():
     except Exception as e:
         return f"Error clearing data: {e}"
 
-
-# -----------------------
-# Run App
-# -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-
-
-
-
-
-
-
-
-
