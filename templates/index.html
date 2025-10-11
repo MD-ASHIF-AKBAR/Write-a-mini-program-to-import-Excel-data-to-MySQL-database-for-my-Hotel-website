@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hotel Demo Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        main {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #333;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        input[type="file"] {
+            padding: 5px;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .table-buttons a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Hotel Demo Dashboard</h1>
+    </header>
+    <main>
+        <div class="section">
+            <label for="fileInput">Upload Excel File</label>
+            <input type="file" id="fileInput" required>
+            <button type="submit" onclick="uploadFile()">Upload</button>
+        </div>
+
+        <div class="section">
+            <h2>View Tables</h2>
+            <div class="table-buttons">
+                <a href="/view/Customers"><button>View Customers</button></a>
+                <a href="/view/Orders"><button>View Orders</button></a>
+                <a href="/view/OrderItems"><button>View Order Items</button></a>
+            </div>
+        </div>
+    </main>
+
+<script>
+async function uploadFile() {
+    const fileInput = document.getElementById("fileInput");
+    if (!fileInput.files.length) {
+        alert("Please select a file first!");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("excel_file", fileInput.files[0]);
+
+    try {
+        const response = await fetch(`/upload`, {
+            method: "POST",
+            body: formData
+        });
+
+        const text = await response.text(); // get raw response
+        try {
+            const result = JSON.parse(text); // try to parse JSON
+            alert(result.message);
+        } catch (e) {
+            console.error("Response is not JSON:", text);
+            alert("Upload failed! Server returned HTML or error page. Check console.");
+        }
+    } catch (error) {
+        alert("Error uploading file: " + error.message);
+    }
+}
+</script>
+
+    
+</body>
+</html>
+
+
+
+
+
+
+
+
