@@ -12,7 +12,7 @@ DB_HOST = os.getenv("host")
 DB_USER = os.getenv("user")
 DB_PASSWORD = os.getenv("password")
 DB_NAME = os.getenv("database")
-DB_PORT = os.getenv("port")
+DB_PORT = 5432
 
 app = Flask(__name__)
 CORS(app)
@@ -146,4 +146,5 @@ def clear_data():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
