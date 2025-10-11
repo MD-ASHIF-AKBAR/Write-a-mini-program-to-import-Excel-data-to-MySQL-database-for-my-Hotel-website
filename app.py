@@ -3,16 +3,27 @@ from flask_cors import CORS
 import pandas as pd
 import psycopg2
 
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # load from .env file
+
+DB_HOST = os.getenv("host")
+DB_USER = os.getenv("user")
+DB_PASSWORD = os.getenv("password")
+DB_NAME = os.getenv("database")
+DB_PORT = os.getenv("port")
+
 app = Flask(__name__)
 CORS(app)
 
 def get_db_connection():
     conn = psycopg2.connect(
-        host="dpg-d3jbk7i4d50c73f31jq0-a",
-        user="storage_u6e8_user",
-        password="6i0Us6xp0G5hPgoNfiUewnWbSma4L86C",
-        database="storage_u6e8",
-        port=5432
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD,
+        database=DB_NAME,
+        port=DB_PORT
     )
     return conn
 
@@ -135,3 +146,4 @@ def clear_data():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
