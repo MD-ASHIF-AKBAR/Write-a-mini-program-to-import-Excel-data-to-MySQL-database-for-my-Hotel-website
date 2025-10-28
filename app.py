@@ -72,7 +72,7 @@ def upload_file():
     
     return jsonify({"message": "No file received"}), 400
 
-@app.route('/view/<table_name>')
+@app.route('/doubt/<table_name>')
 def view_table(table_name):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -145,6 +145,7 @@ def clear_data():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
 
 
 
